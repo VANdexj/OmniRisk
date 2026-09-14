@@ -1,0 +1,22 @@
+<launch>
+<!-- Launch file for initial MID360 LiDAR -->
+
+	<arg name="rviz" default="false" />
+
+	<rosparam command="load" file="$(find fast_lio)/config/mid360.yaml" />
+	<rosparam command="load" file="$(find fast_lio)/config/initial_align.yaml" />
+
+	<!-- environment variable! -->
+	<!-- <param name="wxx/initial_align/Init_Body_pos_x" type="double" value="0.0" />
+	<param name="wxx/initial_align/Init_Body_pos_y" type="double" value="0.0" />
+	<param name="wxx/initial_align/Init_Body_pos_z" type="double" value="0.0" /> -->
+
+	<param name="feature_extract_enable" type="bool" value="0"/>
+	<param name="point_filter_num" type="int" value="2"/>
+    <node pkg="fast_lio" type="initial_align" name="initial_align" output="screen" /> 
+	
+	<group if="$(arg rviz)">
+	<node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find fast_lio)/rviz_cfg/loam_livox.rviz" />
+	</group>
+
+</launch>

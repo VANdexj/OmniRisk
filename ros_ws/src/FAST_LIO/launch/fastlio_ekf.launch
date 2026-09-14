@@ -1,0 +1,27 @@
+<launch>
+  <!--
+    FastLIO + EKF odometry launch file (only includes existing launch files)
+
+    Topic chain:
+      [T3a] livox_ros_driver2  →  /livox/lidar + /livox/imu
+      [T3b] fast_lio           →  /Odometry (~10 Hz)
+      [T3c] ekf_quat           →  /ekf_quat/ekf_odom (~200 Hz, subscribed by planner/px4ctrl)
+
+    Requires: T1 MAVROS running (provides /mavros/imu/data)
+    Usage:
+      source /home/nv/fastlio_ws/devel/setup.bash
+      roslaunch fast_lio fastlio_ekf.launch
+  -->
+
+  <!-- T3a: Livox MID360 driver -->
+  <include file="$(find livox_ros_driver2)/launch_ROS1/msg_MID360.launch">
+    <arg name="publish_freq" value="20.0"/>
+  </include>
+
+  <!-- T3b: FastLIO mapping/odometry -->
+  <include file="$(find fast_lio)/launch/mapping_mid360.launch"/>
+
+  <!-- T3c: EKF IMU fusion (mavros IMU + FastLIO /Odometry → high-rate odometry) -->
+  <include file="$(find ekf_quat)/launch/ekf_quat_lidar_mavros.launch"/>
+
+</launch>

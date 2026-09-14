@@ -1,0 +1,12 @@
+uint32 id
+uint32 track_uid
+bool confirmed
+bool matched
+uint32 age
+uint32 total_hits
+uint32 missed_frames
+uint32 point_count
+float32 last_iou
+geometry_msgs/Point position
+geometry_msgs/Vector3 velocity
+geometry_msgs/Vector3 dimensions

@@ -1,0 +1,105 @@
+# IMPORTANT: velocity in testing (modifiable)
+velocity: 6
+
+# IMPORTANT: vel_max and acc_max in training
+# not the actual values in testing, ensure consistency between testing and training, please refer to ../policy/primitive.py
+vel_max_train: 6.0
+acc_max_train: 6.0
+
+# IMPORTANT: weight of costs for unit speed (can be visualized in tensorboard)
+wg: 0.8    # guidance
+ws: 1.0    # smoothness
+wa: 1.0    # acceleration (smaller acceleration)
+wc: 1.5    # collision    (distance to obstacle)
+
+# dataset: set image_size = primitive_num × downsampling_factor (×32 for ResNet-18) in each axis
+dataset_path: "../dataset"
+image_height: 96
+image_width: 384   # panoramic 360° → 384=12×32 (12 azimuth bins ×30°)
+
+# omnidirectional + world-azimuth frame: free yaw, the network plans in a gravity-aligned world-azimuth frame (not rotated with heading yaw)
+omnidirectional: true
+
+# trajectory and primitive param (Note: traj_time = 2 * radio / vel_max) (can be visualized in rviz)
+horizon_num: 12             # omnidirectional: 360°/12 = 30° per anchor
+vertical_num: 3
+horizon_camera_fov: 360.0   # omnidirectional horizontal
+vertical_camera_fov: 59.0   # matches the LiDAR elevation band [-7°,52°] (span 59°)
+vertical_center_deg: 22.5   # LiDAR elevation band center (=(-7+52)/2), lifts vertical anchors into the LiDAR FOV
+horizon_anchor_fov: 30.0    # delta_yaw half-width per cell = ±15° (= half of the 30° spacing)
+vertical_anchor_fov: 20.0   # delta_pitch half-width per cell ≈ half of the 19.7° spacing
+lidar_elev_min_deg: -7.0
+lidar_elev_max_deg: 52.0
+radio_range: 5   # planning horizon: 2 * radio_range
+radio_num: 1        # only support 1 currently
+
+# safety penalties
+d0: 1.2
+r: 0.6
+
+# distribution for unit state sampling
+vx_mean_unit: 0.4
+vy_mean_unit: 0.0
+vz_mean_unit: 0.0
+vx_std_unit: 2.0
+vy_std_unit: 1.2          # v3: 0.45→1.2, covers initial states already flying sideways
+vz_std_unit: 0.3
+ax_mean_unit: 0.0
+ay_mean_unit: 0.0
+az_mean_unit: 0.0
+ax_std_unit: 0.5
+ay_std_unit: 0.5
+az_std_unit: 0.3
+goal_pitch_std: 10.0  # clip goal_length to: 2 * radio_range; 10% probability [0, 2 * radio_range]
+goal_yaw_std: 45.0    # v3: 20→45, so sideways endstates stay competitive in wg when the goal is off to the side
+
+# extend the map to avoid trajectory exceeding bounds (especially in z-axis) and treating the sky outside the map as obstacle
+map_expand_min: [0, 0, 0.2]
+map_expand_max: [0, 0, 6.0]
+
+# dynamic obstacle avoidance — anisotropic Gaussian risk field (obstacles extrapolated as c+v_o·t, velocity folded into the covariance, evaluated analytically per frame)
+# per-point cost = S·Softplus(α·(v_uav−v_obs)·n_grad), summed with equal weights over sample points along the candidate Σ_i
+#   S = exp(−½m²), m² = r_par²/σ_par² + |r_perp|²/σ_perp²; n_grad = ∇S/|∇S| is the worsening axis
+dynamic_weight: 1.0
+aniso_alpha:         1.0   # Softplus sharpness α (applied to proj=v_rel·n_grad)
+aniso_perp_radius_k: 0.4   # σ_perp = k·radius + base (lateral, narrow, leaves an escape corridor)
+aniso_perp_base:     0.1   # σ_perp base (σ_perp≈0.4·r+0.1, r0.45→σ≈0.28: lateral 0.3m→S≈0.56 clear, beyond 0.8m→S≈0)
+aniso_par_radius_k:  1.0   # σ_par slope (longitudinal decoupled from σ_perp, changing σ_perp leaves it untouched)
+aniso_par_base:      0.5   # σ_par base (σ_par = par_radius_k·radius + par_base + speed_k·|v_obs|)
+aniso_par_speed_k:   0.4   # σ_par stretch with speed (deeper warning ahead + longer wake, |v|=2→σ_par≈2.55)
+aniso_sigma_z:       0.5   # vertical softening scale σ_z outside the cylinder band
+# inference fusion weight λ: total = static_score + fusion_lambda * dynamic_score (read-only, not used in training/gradients)
+fusion_lambda: 100
+
+# Single-weight runtime config. Top-level velocity/radio_range/fusion_lambda are still used by training and export;
+# the online LiDAR node only reads the two configs below at startup and never rereads YAML at runtime.
+runtime_modes:
+  cruise:
+    velocity: 4.0
+    radio_range: 4.0
+    fusion_lambda: 0.0
+  dodge:
+    velocity: 4.0
+    radio_range: 4.0
+    fusion_lambda: 10.0
+
+# Selection hysteresis: switch only if a new candidate's total score is lower by at least this much, suppressing frame-to-frame flips between near-equivalent trajectories.
+# Should be slightly above the P95 of frame-to-frame total score jitter in steady scenes; 0 degrades to plain per-frame argmin.
+trajectory_switch_margin: 0.8
+
+# Cap on the endpoint continuity cost: weighted by normalized distance from each candidate endpoint to the previous one; 0 disables.
+# Same score units as trajectory_switch_margin; non-zero values must be calibrated by replaying dangerous scenes from the same bags.
+trajectory_continuity_weight: 0.8
+
+# Max allowed gap since the last successfully committed control trajectory; on timeout, latch the current EKF pose and hover.
+trajectory_refresh_timeout: 0.2
+
+# dataset-time mask noise augmentation (M-detector noise simulation, train only)
+mask_aug: true
+mask_fp_rate: 0.02      # false-positive bit-flip rate
+mask_fn_rate: 0.05      # false-negative bit-flip rate
+
+# LiDAR yaw-only compensation done in-simulator (dataset_generator.cpp uses
+# T_wc_yaw_only for renderRangeImage and writes yaw-only pose to pose.csv).
+# Dataloader skips runtime reprojection.
+yaw_level_compensation: false

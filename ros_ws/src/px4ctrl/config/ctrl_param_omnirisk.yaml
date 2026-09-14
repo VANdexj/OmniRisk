@@ -1,0 +1,66 @@
+# ctrl_param_omnirisk.yaml — OmniRisk vehicle-specific config
+# Based on ctrl_param_fpv.yaml shipped with px4ctrl; only physical parameters changed, all gains reused
+
+# ===== Must be set for the actual vehicle =====
+mass        : 0.78   # kg, matches original so3_control mass=0.77
+gra         : 9.81
+low_voltage : 14.8   # V, 4S LiPo warning voltage; use 21.0 for 6S
+
+# ===== Validated values reused from another project; no tuning needed for first flight =====
+pose_solver     : 0
+ctrl_freq_max   : 200.0
+max_manual_vel  : 1.0
+max_angle       : 45    # conservative for first flight; the other project uses 80, raise once stable
+
+rc_reverse:
+    roll     : false
+    pitch    : false
+    yaw      : false
+    throttle : true
+
+auto_takeoff_land:
+    enable             : true
+    enable_auto_arm    : true
+    no_RC              : false
+    takeoff_height     : 0.6    # m
+    takeoff_land_speed : 0.2    # m/s
+
+thrust_model:
+    print_value           : false
+    accurate_thrust_model : false  # uncalibrated, approximated with hover_percentage
+    noisy_imu             : false
+    K1: 0.7583   # only used when accurate_thrust_model=true; kept as backup
+    K2: 1.6942
+    K3: 0.6786
+    hover_percentage: 0.3  # matches original so3_control hover_thrust=0.38
+
+# PID gains: reused as-is from fpv.yaml (extensively flight-tested in another project)
+gain:
+    Kp0: 2.5
+    Kp1: 2.5
+    Kp2: 2.5
+    Kv0: 3.0
+    Kv1: 3.0
+    Kv2: 3.0
+    Kvi0: 0.0
+    Kvi1: 0.0
+    Kvi2: 0.0
+    Kvd0: 0.0
+    Kvd1: 0.0
+    Kvd2: 0.0
+    KAngR: 20.0
+    KAngP: 20.0
+    KAngY: 4.0
+
+rotor_drag:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    k_thrust_horz: 0.0
+
+msg_timeout:
+    odom: 0.5
+    rc  : 0.5
+    cmd : 0.1
+    imu : 0.5
+    bat : 0.5

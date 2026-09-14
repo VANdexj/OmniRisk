@@ -1,0 +1,21 @@
+<launch>
+  <!--
+    Real-flight controller launch file (px4ctrl)
+    Replaces the original so3_control (network_control_node)
+
+    Topics:
+      ~odom  ← /ekf_quat/ekf_odom    (high-rate EKF odometry, nav_msgs/Odometry)
+      ~cmd   ← /so3_control/pos_cmd  (OmniRisk planner output, quadrotor_msgs/PositionCommand)
+      /mavros/imu/data                (hard-coded in px4ctrl, not data_raw)
+
+    Takeoff: rostopic pub /px4ctrl/takeoff_land quadrotor_msgs/TakeoffLand "takeoff_land_cmd: 1"
+    Land:    rostopic pub /px4ctrl/takeoff_land quadrotor_msgs/TakeoffLand "takeoff_land_cmd: 2"
+  -->
+
+  <node pkg="px4ctrl" type="px4ctrl_node" name="px4ctrl" output="screen">
+    <remap from="~odom" to="/ekf_quat/ekf_odom" />
+    <remap from="~cmd"  to="/so3_control/pos_cmd" />
+    <rosparam command="load" file="$(find px4ctrl)/config/ctrl_param_omnirisk.yaml" />
+  </node>
+
+</launch>

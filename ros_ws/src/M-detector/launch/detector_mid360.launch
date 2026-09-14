@@ -1,0 +1,42 @@
+<launch>
+
+
+	<!-- <arg name="rviz" default="true" /> -->
+	<arg name="rviz" default="false" />
+	<arg name="enable_tracker" default="true" />
+	<arg name="points_topic" default="/cloud_registered_no_point_filter" />
+	<arg name="points_in_world_frame" default="true" />
+	<arg name="odom_topic" default="/Odometry" />
+	<arg name="output_frame_id" default="world" />
+	<arg name="publish_std_points" default="true" />
+	<arg name="time_file" default=""/>	
+	<arg name="out_path" default=""/>	
+	<arg name="out_origin_path" default=""/>
+	<arg name="pose_log" default="false"/>
+	<arg name="pose_log_file" default=""/>
+	<arg name="cluster_out_file" default=""/>
+	<arg name="time_breakdown_file" default=""/>
+
+	<rosparam command="load" file="$(find m_detector)/config/mid360/mid360.yaml" />
+	<param name="dyn_obj/points_topic" type="string" value="$(arg points_topic)" />
+	<param name="dyn_obj/points_in_world_frame" type="bool" value="$(arg points_in_world_frame)" />
+	<param name="dyn_obj/odom_topic" type="string" value="$(arg odom_topic)" />
+	<param name="dyn_obj/frame_id" type="string" value="$(arg output_frame_id)" />
+	<param name="dyn_obj/publish_std_points" type="bool" value="$(arg publish_std_points)" />
+	<param name="dyn_obj/tracker/enabled" type="bool" value="$(arg enable_tracker)" />
+	<param name="dyn_obj/out_file" type="string" value="$(arg out_path)" />
+	<param name="dyn_obj/out_file_origin" type="string" value="$(arg out_origin_path)" />
+	<param name="dyn_obj/time_file" type="string" value="$(arg time_file)" />
+	<param name="dyn_obj/pose_log" type="bool" value="$(arg pose_log)" />
+	<param name="dyn_obj/pose_log_file" type="string" value="$(arg pose_log_file)" />
+	<param name="dyn_obj/cluster_out_file" type="string" value="$(arg cluster_out_file)" />
+	<param name="dyn_obj/time_breakdown_file" type="string" value="$(arg time_breakdown_file)" />
+
+	<node pkg="m_detector" type="dynfilter" name="dynfilter" output="screen" />
+	<group if="$(arg rviz)">
+	<node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find m_detector)/rviz/mid360.rviz" />
+	</group>
+
+  	  
+
+</launch>

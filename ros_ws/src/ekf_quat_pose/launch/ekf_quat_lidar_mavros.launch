@@ -1,0 +1,69 @@
+<launch>
+    
+    <node pkg="ekf_quat" type="ekf_quat" name="ekf_quat" output="screen">
+        <remap from="~imu" to="/mavros/imu/data"/>
+        <remap from="~bodyodometry" to="/Odometry"/> 
+        <!-- <remap from="~bodyodometry" to="/robot/dlo/odom_node/odom"/>  -->
+
+        <remap from="~ekf_odom" to="/ekf_quat/ekf_odom"/>
+
+        <!-- parms -->
+        <rosparam file="$(find ekf_quat)/launch/PX4_vio_drone_mavros.yaml" command="load" />
+
+        <!-- initial pos offset before pub-->
+        <!-- <param name="offset_px" type="double" value="$(env ipx)"/> 
+        <param name="offset_py" type="double" value="$(env ipy)"/> 
+        <param name="offset_pz" type="double" value="$(env ipz)"/>  -->
+    
+        <param name="offset_px" type="double" value="0.0"/> 
+        <param name="offset_py" type="double" value="0.0"/> 
+        <param name="offset_pz" type="double" value="0.0"/> 
+        
+
+        <!--body in IMU frame-->
+        <param name="imu_trans_x" type="double" value="0.0"/> 
+        <param name="imu_trans_y" type="double" value="0.0"/> 
+        <param name="imu_trans_z" type="double" value="0.0"/> 
+
+        <!-- Qt -->
+        <!-- kdkdkd -->
+        <param name="gyro_cov" type="double" value="0.05"/> 
+        <param name="acc_cov" type="double" value="0.60"/>
+        <!-- Rt -->
+        <!-- <param name="position_cov" type="double" value="0.01"/>
+        <param name="q_rp_cov" type="double" value="0.1"/>
+        <param name="q_yaw_cov" type="double" value="0.1"/>    -->
+        <param name="position_cov" type="double" value="0.01"/>
+        <param name="q_rp_cov" type="double" value="0.01"/>
+        <param name="q_yaw_cov" type="double" value="0.01"/>   
+        <param name="cutoff_freq" type="double" value="20"/>   
+
+    </node>
+
+     <!-- <node pkg="odom_visualization" name="odom_visualization" type="odom_visualization" output="screen">
+		<remap from="~odom" to="/ekf/ekf_odom_wz" />
+        
+        <param name="color/a" value="1.0"/>    
+        <param name="color/r" value="0.0"/>        
+        <param name="color/g" value="0.0"/>        
+        <param name="color/b" value="1.0"/>       
+        <param name="covariance_scale" value="100.0"/>       
+        <param name="robot_scale" value="10.0"/>
+        
+    </node>
+
+     <node pkg="odom_visualization" name="odom_visualization2" type="odom_visualization" output="screen">
+        <remap from="~odom" to="/Odometry"/>
+        
+        <param name="color/a" value="1.0"/>    
+        <param name="color/r" value="0.0"/>        
+        <param name="color/g" value="1.0"/>        
+        <param name="color/b" value="1.0"/>       
+        <param name="covariance_scale" value="100.0"/>       
+        <param name="robot_scale" value="10.0"/>
+        
+    </node> -->
+
+    <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ekf_quat)/launch/ekf.rviz" output="screen" /> -->
+
+</launch>

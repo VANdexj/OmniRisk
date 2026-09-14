@@ -1,0 +1,51 @@
+common:
+  imu_topic: /livox/imu
+  lid_topic: /livox/lidar
+  time_offset_lidar_to_imu: 0.0
+  time_sync_en: false
+mapping:
+  acc_cov: 0.1
+  b_acc_cov: 0.0001
+  b_gyr_cov: 0.0001
+  det_range: 100.0
+  extrinsic_R: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+  extrinsic_T: [-0.011, -0.02329, 0.04412]
+  extrinsic_est_en: false
+  fov_degree: 360
+  gyr_cov: 0.1
+pcd_save:
+  interval: -1
+  pcd_save_en: false
+preprocess:
+  blind: 0.5
+  lidar_type: 1
+  scan_line: 4
+publish:
+  dense_publish_en: false
+  path_en: false
+  scan_bodyframe_pub_en: false
+  scan_publish_en: false
+  debug_circular_scan_publish_en: false
+  debug_circular_cloud_radius: 2.0
+  no_point_filter_scan_publish_en: true
+wxx:
+  # Lidar_Odom = Lidar_wrt_Body_R*(Body_Odom + Lidar_wrt_Body_T)
+  Lidar_wrt_Body_R: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+  Lidar_wrt_Body_T: [0, 0, 0]
+  initial_map_from_pcd: false
+  map_incremental: true
+  initial_map_pcd_name: origin.pcd
+  save_new_map_to_pcd: true
+  new_map_pcd_name: new.pcd
+
+  # sched_setaffinity
+  sched_setaffinity_en:     true
+  cpu_core_num:             8
+  sched_setaffinity_cores:  [0, 1, 2] # only need 3 cores
+
+  # cpu_monitor
+  cpu_monitor_en:           true
+  cpu_monitor_filter_type:  0         # 0:SimpleMovingAverageFilter; 1:ExponentialMovingAverageFilter; 2:LowPassFilter
+  cpu_monitor_filter_filter_param1:   15 # window_size for SimpleMovingAverageFilter; alpha for ExponentialMovingAverageFilter; cutoff_freq for LowPassFilter
+  cpu_monitor_filter_filter_param2:   10 # nouse for SimpleMovingAverageFilter and ExponentialMovingAverageFilter; sample_rate for LowPassFilter
+  cpu_monitor_freq:   10              # note: for LowPassFilter, sample_rate should always be >= cpu_monitor_freq and at least 2x cutoff_freq (Nyquist)

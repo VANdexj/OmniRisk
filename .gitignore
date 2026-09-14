@@ -1,0 +1,71 @@
+.idea/
+.catkin_tools/
+
+Controller/devel/
+Controller/build/
+Controller/.catkin_workspace
+
+Simulator/devel/
+Simulator/build/
+Simulator/logs/
+Simulator/.catkin_tools/
+Simulator/.catkin_workspace
+
+OmniRisk/saved/*
+OmniRisk/results/
+dataset/
+dataset_test/
+
+
+# Python virtual env
+omnirisk_env/
+
+# Python bytecode cache
+__pycache__/
+*.py[cod]
+
+# ROS bag recordings
+*.bag
+bags/
+
+# ROS workspace build outputs
+ros_ws/build/
+ros_ws/devel/
+ros_ws/.catkin_workspace
+ros_ws/logs/
+ros_ws/.catkin_tools/
+Simulator/dataset_test/
+.vscode/
+
+# Local design notes / drafts
+design_docs/
+
+# Local validation scripts / visualization outputs
+scripts/
+
+# Local rviz layouts
+*.rviz
+
+# Local config backups
+*.yaml.bak
+
+# Local archives
+OmniRisk/saved_archive_*/
+
+# Local visualization output
+view_out/
+
+# benchmark build outputs
+benchmark/FAPP/build/
+benchmark/FAPP/devel/
+benchmark/FAPP/install/
+benchmark/FAPP/logs/
+benchmark/FAPP/.catkin_tools/
+benchmark/SIMP/build/
+benchmark/SIMP/devel/
+benchmark/SIMP/logs/
+benchmark/SIMP/.catkin_tools/
+
+# Not included in this repo: benchmark / isaaclab
+benchmark/
+isaaclab/

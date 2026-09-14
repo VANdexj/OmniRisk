@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="424" height="312" viewBox="0 0 424 312" role="img" aria-label="Input ablation, success rate, n = 50. Head-on: depth only 62%, depth + mask 88%, full tensor 96%. Crossing: 22%, 30%, 92%. Rear: 26%, 34%, 94%.">
+  <style>
+    .ink { fill: #1f2328 } .sub { fill: #59636e } .legend { fill: #3d444d } .grid { stroke: #eaeef2 }
+    .b1 { fill: #d4cff3 } .b2 { fill: #a297e3 } .b3 { fill: #5747c4 }
+    @media (prefers-color-scheme: dark) {
+      .ink { fill: #e6edf3 } .sub { fill: #9198a1 } .legend { fill: #c9d1d9 } .grid { stroke: #262c36 }
+      .b1 { fill: #3a3463 } .b2 { fill: #6052b8 } .b3 { fill: #9d92f2 }
+    }
+  </style>
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif">
+    <text x="12" y="22" font-size="14" font-weight="600" class="ink">Why velocity channels matter <tspan font-weight="400" class="sub">(success %, n = 50)</tspan></text>
+    <g font-size="12" class="legend">
+      <rect x="12" y="38" width="10" height="10" rx="2" class="b1"/><text x="28" y="47">Depth only</text>
+      <rect x="102" y="38" width="10" height="10" rx="2" class="b2"/><text x="118" y="47">Depth + mask</text>
+      <rect x="206" y="38" width="10" height="10" rx="2" class="b3"/><text x="222" y="47">Full tensor (ours)</text>
+    </g>
+    <g transform="translate(6 62)">
+      <g stroke-width="1" class="grid">
+        <line x1="40" y1="216" x2="392" y2="216"/>
+        <line x1="40" y1="165.5" x2="392" y2="165.5"/>
+        <line x1="40" y1="115" x2="392" y2="115"/>
+        <line x1="40" y1="64.5" x2="392" y2="64.5"/>
+        <line x1="40" y1="14" x2="392" y2="14"/>
+      </g>
+      <g font-size="11" class="sub">
+        <g text-anchor="end">
+          <text x="32" y="220">0</text>
+          <text x="32" y="169.5">25</text>
+          <text x="32" y="119">50</text>
+          <text x="32" y="68.5">75</text>
+          <text x="32" y="18">100</text>
+        </g>
+        <g text-anchor="middle">
+          <text x="98.7" y="238">Head-on</text>
+          <text x="216" y="238">Crossing</text>
+          <text x="333.3" y="238">Rear</text>
+        </g>
+      </g>
+      <path d="M 57.7 216 L 57.7 94.8 Q 57.7 90.8 61.7 90.8 L 79.7 90.8 Q 83.7 90.8 83.7 94.8 L 83.7 216 Z" class="b1"/>
+      <path d="M 85.7 216 L 85.7 42.2 Q 85.7 38.2 89.7 38.2 L 107.7 38.2 Q 111.7 38.2 111.7 42.2 L 111.7 216 Z" class="b2"/>
+      <path d="M 113.7 216 L 113.7 26.1 Q 113.7 22.1 117.7 22.1 L 135.7 22.1 Q 139.7 22.1 139.7 26.1 L 139.7 216 Z" class="b3"/>
+      <path d="M 175 216 L 175 175.6 Q 175 171.6 179 171.6 L 197 171.6 Q 201 171.6 201 175.6 L 201 216 Z" class="b1"/>
+      <path d="M 203 216 L 203 159.4 Q 203 155.4 207 155.4 L 225 155.4 Q 229 155.4 229 159.4 L 229 216 Z" class="b2"/>
+      <path d="M 231 216 L 231 34.2 Q 231 30.2 235 30.2 L 253 30.2 Q 257 30.2 257 34.2 L 257 216 Z" class="b3"/>
+      <path d="M 292.3 216 L 292.3 167.5 Q 292.3 163.5 296.3 163.5 L 314.3 163.5 Q 318.3 163.5 318.3 167.5 L 318.3 216 Z" class="b1"/>
+      <path d="M 320.3 216 L 320.3 151.3 Q 320.3 147.3 324.3 147.3 L 342.3 147.3 Q 346.3 147.3 346.3 151.3 L 346.3 216 Z" class="b2"/>
+      <path d="M 348.3 216 L 348.3 30.1 Q 348.3 26.1 352.3 26.1 L 370.3 26.1 Q 374.3 26.1 374.3 30.1 L 374.3 216 Z" class="b3"/>
+      <g font-size="10.5" text-anchor="middle" class="ink">
+        <text x="126.7" y="17.1">96</text>
+        <text x="188" y="166.6">22</text>
+        <text x="216" y="150.4">30</text>
+        <text x="244" y="25.2">92</text>
+        <text x="361.3" y="21.1">94</text>
+      </g>
+    </g>
+  </g>
+</svg>

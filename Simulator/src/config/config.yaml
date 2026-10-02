@@ -1,0 +1,249 @@
+# 1. ROS node parameters =====================================================
+odom_topic: "/sim/odom"
+depth_topic: "/depth_image"
+lidar_topic: "/lidar_points"
+
+render_depth: false    # LiDAR-only: disable depth rendering so callback_depth does not compete with LiDAR for the GPU
+depth_fps: 33          # odom 100hz, depth 33hz, render once every 3 odom frames
+
+render_lidar: true
+lidar_fps: 10
+
+# 2. Simulation environment =================================================
+random_map: true       # use a prebuilt point cloud map or a random map
+resolution: 0.1        # map resolution
+
+# 2.1 Prebuilt point cloud map (deprecated)
+ply_file: "src/pointcloud/forest.ply"
+expand_x_times: 0      # copies along x (unused by the CUDA version)
+expand_y_times: 0      # copies along y (unused by the CUDA version)
+occupy_threshold: 0    # min points for a voxel to count as occupied (unused by the CPU version)
+
+# 2.2 Random map ======
+seed: 3
+x_length: 60           # actual random extent (larger XY area is mirrored)
+y_length: 60
+z_length: 15
+maze_type: 2  # 1: cave 2: pillars 3: maze 5: forest 6: rooms 7: walls 8: arena 9: corridor (current policy supports 1,2,5,7,8)
+# Cave
+complexity: 0.02       # complexity 0.0-0.5
+fill: 0.1              # fill ratio 0.0-0.4
+fractal: 1
+attenuation: 0.1
+# Pillars
+width_min: 0.6
+width_max: 1.5
+obstacle_number: 100
+# Maze
+road_width: 3
+add_wall_x: 1
+add_wall_y: 1
+# Forest
+tree_file: "/workspace/OmniRisk/Simulator/src/pointcloud/tree.ply"      # path inside the Docker container
+tree_dist: 4
+# Rooms
+room_number: 4         # rooms per axis (room size = x_length / room_number)
+max_windows: 2         # max windows per wall
+window_size_min: 2.0
+window_size_max: 2.8
+add_ceiling: 0         # add a ceiling
+# Walls
+wall_width_min: 0.5
+wall_width_max: 6.0
+wall_thick: 0.5
+wall_number: 100       # number of walls
+wall_ceiling: 1        # add a ceiling
+# Arena (maze_type: 8): open enclosed space, used with swarm_dataset moving balls + cylinder_dataset dynamic cylinders
+pole_number: 0         # number of static poles
+pole_radius_min: 0.15  # min static pole radius (m)
+pole_radius_max: 0.50  # max static pole radius (m)
+arena_ceiling: 1       # add a ceiling (0/1)
+arena_walls: 1         # add enclosing walls (0/1)
+
+# 2.3 Dynamic spherical obstacles (swarm) ====================================
+swarm_dataset:
+  enabled: true
+  history_frames: 1           # single-frame mode, set to 1
+  frame_dt: 0.1
+  sphere_count_min: 1
+  sphere_count_max: 3
+  sphere_radius: 0.5
+  dynamic_speed_min: 0.2
+  dynamic_speed_max: 3.0
+  sample_step: 0.05
+  center_margin_xy: 4.0
+  center_z_range: [1.0, 4.0]
+  visible_depth_min: 0.5
+  visible_depth_max: 16.0
+  depth_margin: 0.8
+  image_border: 8
+  camera_clearance: 0.5
+  static_clearance: 0.5
+  min_center_distance: 0.6
+  drone_clearance_margin: 0.1
+  max_attempts_per_obstacle: 150   # 80 → 150, shared by cylinder/sphere, more patient
+  # ─── CPA inverse placement (per-frame bucket dispatch, replaces the old front/rear + crossing/rear_chase) ───
+  bucket_dispatch:
+    enabled: true
+    ratios:                   # normalized on load, asserts the sum ≈ 1
+      no_dynamic:  0.12       # empty mask, static baseline
+      intercept:   0.40       # small miss + t* inside the planning window: forward flight collides, sideways flight escapes
+      near_miss:   0.28       # miss within the ball-radius + body narrow band: hardest ranking boundary
+      no_threat:   0.15       # large miss or cannot catch up within the window: low score
+      all_blocked: 0.05       # 4~6 balls with near-zero miss covering 360°: score saturates
+
+  # CPA parameters ==============================================================
+  # Drone intent velocity/goal sampling: C++ replica of the training-side _get_random_state/_get_random_goal
+  # The following 12 values must match OmniRisk/config/traj_opt.yaml exactly; keep them in sync!
+  cpa:
+    vel_max: 6.0              # = traj_opt.yaml vel_max_train
+    vx_mean_unit: 0.4         # lognormal vx: mean=log(1-vx_mean_unit)
+    vx_std_unit:  2.0         #               sigma=log(vx_std_unit)
+    vy_mean_unit: 0.0
+    vy_std_unit:  1.2
+    vz_mean_unit: 0.0
+    vz_std_unit:  0.3
+    vel_norm_cap_factor: 1.2  # resample until ‖v‖ < 1.2·vel_max
+    heading_vel_std_deg: 25.0 # Gaussian jitter of velocity heading around the intent heading
+    goal_length:    10.0      # = 2·radio_range
+    goal_pitch_std: 10.0
+    goal_yaw_std:   45.0
+
+    # CPA geometry (threat = trunk-height vertical cylinder, solved in the horizontal plane; miss = horizontal distance)
+    cpa_time_min: 0.3         # range of closest-approach time t*
+    cpa_time_max: 0.5         # 0.5 keeps closing distance |q|·t* ~3m, together with max_spawn_distance this pulls cylinders close
+    miss_intercept_min: 0.0   # intercept bucket horizontal miss (collision threshold ≈ drone 0.2 + cylinder r 0.3~0.6, all within → must dodge)
+    miss_intercept_max: 0.3
+    miss_near_miss_min: 0.3   # near-miss bucket horizontal miss band (straddles the collision boundary)
+    miss_near_miss_max: 1.0
+    miss_no_threat_min: 1.0   # no-threat bucket large horizontal miss (keep < 3, otherwise spawn distance ≥ miss exceeds max_spawn_distance)
+    miss_no_threat_max: 2.5
+    miss_all_blocked_min: 0.0 # all-blocked bucket near-zero horizontal miss
+    miss_all_blocked_max: 0.15
+    sphere_dir_angle_min_deg: 0.0   # horizontal angle of cylinder approach relative to heading into the drone velocity (0=head-on, 180=from behind)
+    sphere_dir_angle_max_deg: 180.0
+    speed_min: 1.5            # higher min cylinder speed so obstacle motion is a meaningful share of closing speed (stronger dynamic signal)
+    speed_max: 4.0
+    rear_angle_threshold_deg: 120.0 # θ above this counts as approaching from behind
+    rear_speed_max: 8.0       # looser cylinder speed cap when approaching from behind
+    max_resample: 120         # max resamples when inverse solve or visibility fails (raised after adding the occlusion check); falls back to no_threat
+    max_spawn_distance: 3.0   # hard cap on horizontal spawn distance of every dynamic cylinder at t=0 (resample if exceeded), keeps them close
+    distractor_min_miss: 2.0  # (retired: non-threat cylinders use the miss_no_threat range, no random distractors)
+    all_blocked_count_min: 4
+    all_blocked_count_max: 6
+    # Threat cylinder: vertical, its band follows the current drone height (z_center = drone z, clamped to world bounds),
+    #   height = cyl_z_max - cyl_z_min (only defines the 1.5m cylinder height, not an absolute z range).
+    #   The cylinder always covers the drone z → visible and a real threat; radial = horizontal miss, the band blocks z escape.
+    cyl_radius_min: 0.3
+    cyl_radius_max: 0.6
+    cyl_z_min: 0.5
+    cyl_z_max: 2.0
+
+# 2.4 Dynamic cylinder obstacles (random clutter, retired) ===================
+# CPA threat cylinders come from swarm_dataset.cpa; this block only keeps validateMovingCylinder parameters
+# (static_clearance / validate_future_seconds etc.); enabled=false turns off random clutter cylinders.
+cylinder_dataset:
+  enabled: true
+  cylinder_count_min: 1
+  cylinder_count_max: 4           # 6 → 4, fewer placement failures
+  cylinder_radius_min: 0.25
+  cylinder_radius_max: 0.6
+  cylinder_height_min: 1.0
+  cylinder_height_max: 5.0        # 8.0 → 5.0, more placement room with z_length=15
+  cylinder_speed_min: 0.5
+  cylinder_speed_max: 3.0         # 5.0 → 3.0, smaller displacement within 0.5s so validateMovingCylinder passes more easily
+  cylinder_static_clearance: 0.4
+  cylinder_drone_clearance_margin: 0.2
+  min_cylinder_distance: 0.6
+  validate_future_seconds: 0.3    # 0.5 → 0.3, matches the lower speed
+  trajectory_check_dt: 0.05
+
+# 2.5 Simulated dynamic obstacles (sensor_simulator real-time, independent of the dataset) ==
+# Mutually exclusive with sim_scenario (sim_scenario.enabled takes over in initDynamicObstacles).
+# Spawned automatically at startup; a timer drives constant-velocity motion with boundary bounces, no RViz trigger needed.
+# With maze_type=9 (corridor) the spawn/bounce region shrinks to the corridor (see arena_x_half_/arena_y_half_
+# set by corridorCrossing); otherwise it falls back to the bounding box of the whole map cloud.
+# Values below are tuned for the corridor scene (speeds within the training range [0.2,4.0], cylinders only, no balls).
+sim_dynamic:
+  enabled: true          # true enables simulated dynamic obstacles
+  update_hz: 100         # obstacle position update rate (Hz)
+  z_min: 0.5             # obstacle Z lower bound (m)
+  z_max: 2.5             # obstacle Z upper bound (m)
+  # Moving balls
+  sphere_count: 0
+  sphere_radius: 0.5
+  sphere_speed_min: 2.0
+  sphere_speed_max: 4.0
+  # Dynamic cylinders
+  cylinder_count: 4
+  cylinder_radius_min: 0.25
+  cylinder_radius_max: 0.25
+  cylinder_height_min: 1.5
+  cylinder_height_max: 2.5
+  cylinder_speed_min: 0.5
+  cylinder_speed_max: 2.5
+
+# 2.5b Omnidirectional avoidance test scenario (sensor_simulator_cuda only, exclusive with sim_dynamic) ==
+# Usage: in RViz, set a far 2D Nav Goal to make the drone cruise, then click Publish Point → queues a wave of
+# collision-course balls. Each ball spawns at its own spawn_delay and solves its lead from the current pos+vel (CPA≈0),
+# so later balls still aim precisely after the drone has dodged earlier ones. Balls fly straight at constant speed, no bounces. Click again to repeat.
+# bearing_deg: approach direction relative to drone heading (0=front, 90=left, 180=rear, 270=right). Overrides sim_dynamic when enabled.
+# elev_deg: approach elevation (0=level at body height, >0=diving from above); must stay within lidar vertical FOV -7°~52°, so only ≥0; negative comes from below into the blind zone.
+# speed: ball speed (m/s, within training range [0.2,4.0]). lead_time: reaction window τ (s), the ball reaches the drone τ s after spawning,
+# spawn distance ≈ τ·speed (larger τ spawns farther and gives more reaction time).
+# spawn_delay: delay after trigger (s, default 0); staggers a wave, arrival time ≈ spawn_delay + lead_time.
+# offset: optional lateral offset (m, signed, + = left of approach direction, default 0 = direct hit CPA≈0); non-zero passes by at ≈|offset|.
+# aim_up: optional vertical raise (m, default 0); aim point = body height + aim_up, within the upper lidar FOV (-7°~52°).
+sim_scenario:
+  enabled: false
+  scenario: multi  # head_on | side | multi
+  sphere_radius: 0.2  # radius of the ball standing in for a neighbor drone (within training range)
+  scenarios:
+    head_on:               # head-on: single ball from the front
+      - {bearing_deg: 0,   elev_deg: 0, speed: 2.5, lead_time: 2.5, aim_up: 0.8}
+    side:                  # side: single ball crossing from the left
+      - {bearing_deg: 180,  elev_deg: 0, speed: 4.5, lead_time: 4.5, offset: 0.2, aim_up: 0.4}
+    multi:                 # multi-direction wave: 6 staggered balls (~1s apart, each re-aims at the current drone position), spread over 360°, mixed level and diving
+      - {bearing_deg: 0,   elev_deg: 0,  speed: 3.5, lead_time: 2.0, spawn_delay: 0.0}   # front, level (body height)
+      - {bearing_deg: 120, elev_deg: 30, speed: 3.0, lead_time: 2.0, spawn_delay: 1.0}   # rear-left, diving from above
+      - {bearing_deg: 240, elev_deg: 0,  speed: 3.5, lead_time: 2.0, spawn_delay: 2.0}   # rear-right, level
+      - {bearing_deg: 60,  elev_deg: 35, speed: 3.0, lead_time: 2.0, spawn_delay: 3.0}   # front-left, diving from above
+      - {bearing_deg: 180, elev_deg: 0,  speed: 3.5, lead_time: 2.0, spawn_delay: 4.0}   # rear, level
+      - {bearing_deg: 300, elev_deg: 25, speed: 3.0, lead_time: 2.0, spawn_delay: 5.0}   # front-right, diving from above
+
+# 2.6 Collision check (sensor_simulator real-time stats + rviz display, does not affect simulation) ==
+collision_check:
+  enabled: true
+  drone_radius: 0.2     # drone bounding sphere radius (m); collision when distance < drone_radius + obstacle radius
+
+# 3. Sensor parameters ======================================================
+camera:
+  fx: 80.0             # focal length x
+  fy: 80.0             # focal length y
+  cx: 80.0             # principal point x (image center)
+  cy: 45.0              # principal point y (image center)
+  image_width: 160
+  image_height: 90
+  max_depth_dist: 20.0
+  normalize_depth: false
+  pitch: -0.0           # camera pitch relative to body (up is negative, not in the CPU version yet)
+
+lidar:
+  vertical_lines: 96             # range image height, matches perception lidar_H (96 rows × 59° ≈ 0.61°/row)
+  vertical_angle_start: -7.0     # MID360 vertical start angle (actual lower limit)
+  vertical_angle_end: 52.0       # MID360 vertical end angle (actual upper limit)
+  horizontal_num: 360            # range image width, 1°/column
+  horizontal_resolution: 1.0     # horizontal resolution, horizontal_resolution * horizontal_num = 360
+  max_lidar_dist: 20.0
+
+# 4. Data collection =========================================================
+save_path: "../dataset/"
+env_num: 1             # number of maps
+image_num: 10000        # images collected per map
+roll_range: 30          # roll range of samples (kept for diversity; LiDAR rendering applies yaw-only compensation)
+pitch_range: 30         # pitch range of samples (kept for diversity; LiDAR rendering applies yaw-only compensation)
+x_range: 40             # x sampling range (keep below map x_length with some margin)
+y_range: 40             # y sampling range (keep below map y_length with some margin)
+z_range: [0.5, 4]       # z sampling range (keep below map z_length with some margin)
+safe_dist: 0.5          # safety distance, min distance between samples and obstacles
+ply_res: 0.1            # voxel grid size for filtering the saved point cloud

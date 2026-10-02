@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="104" viewBox="0 0 1000 104" role="img" aria-label="84% vs 8% success with 6 obstacles at 10 m/s versus FAPP; 20 ms network inference on Jetson Orin NX; 90.7% real-world success indoor, n = 150; 86.7% real-world success outdoor, n = 150">
+  <style>
+    .ink { fill: #1f2328 } .muted { fill: #5b6475 }
+    @media (prefers-color-scheme: dark) {
+      .ink { fill: #e6edf3 } .muted { fill: #9198a1 }
+    }
+  </style>
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif">
+    <g font-size="36" font-weight="700" text-anchor="middle" class="ink">
+      <text x="125" y="44">84% vs 8%</text>
+      <text x="375" y="44">20 ms</text>
+      <text x="625" y="44">90.7%</text>
+      <text x="875" y="44">86.7%</text>
+    </g>
+    <g font-size="15" text-anchor="middle" class="muted">
+      <text x="125" y="74">success, 6 obstacles<tspan x="125" dy="21">at 10 m/s (vs FAPP)</tspan></text>
+      <text x="375" y="74">network inference,<tspan x="375" dy="21">Jetson Orin NX</tspan></text>
+      <text x="625" y="74">real-world success,<tspan x="625" dy="21">indoor, n = 150</tspan></text>
+      <text x="875" y="74">real-world success,<tspan x="875" dy="21">outdoor, n = 150</tspan></text>
+    </g>
+  </g>
+</svg>

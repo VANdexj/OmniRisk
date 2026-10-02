@@ -1,0 +1,13 @@
+# odom in IMU frame
+Rr_i:       [1, 0, 0, 0]     #ekf bag     #[1, 0, 0, 0] #car   #quaterniod(w,x,y,z)  
+tr_i:       [0.0, 0.0, 0.0] #ekf bag     #[0, 0, 0.]   #cars
+
+# for /livox/imu
+scale_g:    9.81
+# rotation form imu to virtual body
+# rotation_imu:  [  0.9659258, 0, 0.2588190,
+#                           0, 1,         0,
+#                  -0.2588190, 0, 0.9659258]
+rotation_imu:      [  0.000000,  -0.9656520,  0.2598390,
+                      1.0000000,  0.0000000,  0.0000000,
+                      0.00000000,  0.2598390,  0.9656520 ]

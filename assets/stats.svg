@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="120" viewBox="0 0 1000 120" role="img" aria-label="360° omnidirectional perception and action; 15 m/s relative encounter speed, real flight; 36 to 1 maneuvers scored in one forward pass; 30 + 4 single / multi-ball trials, collision-free; 0 real-world fine-tuning (sim to real)">
+  <style>
+    .accent { fill: #6b5bd2 } .teal { fill: #1f7a6a } .orange { fill: #d4572a } .muted { fill: #57606a }
+    @media (prefers-color-scheme: dark) {
+      .accent { fill: #8f82f0 } .teal { fill: #3fb39a } .orange { fill: #f0875a } .muted { fill: #9198a1 }
+    }
+  </style>
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif">
+    <g font-size="40" font-weight="700">
+      <text x="8" y="50" class="accent">360°</text>
+      <text x="208" y="50" class="accent">15 m/s</text>
+      <text x="408" y="50" class="teal">36 → 1</text>
+      <text x="608" y="50" class="teal">30 + 4</text>
+      <text x="808" y="50" class="orange">0</text>
+    </g>
+    <g font-size="15" class="muted">
+      <text x="8" y="84">omnidirectional<tspan x="8" dy="21">perception &amp; action</tspan></text>
+      <text x="208" y="84">relative encounter<tspan x="208" dy="21">speed, real flight</tspan></text>
+      <text x="408" y="84">maneuvers scored in<tspan x="408" dy="21">one forward pass</tspan></text>
+      <text x="608" y="84">single / multi-ball<tspan x="608" dy="21">trials, collision-free</tspan></text>
+      <text x="808" y="84">real-world fine-tuning<tspan x="808" dy="21">(sim → real)</tspan></text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,106 @@
+dyn_obj:
+    points_topic: "/cloud_registered_body"
+    odom_topic: "/Odometry"
+    frame_id: "camera_init"
+    pc_topic: "/lx_camera_node/LxCamera_LidarCloud"
+
+    dataset: 3 #0 for kitti, 1 for nuscenes, 2 for waymo, 3 for avia
+    buffer_delay: 0.1
+    buffer_size: 300000
+    points_num_perframe: 40000
+    depth_map_dur: 0.2
+    max_depth_map_num: 5
+    # max_pixel_points: 50
+    max_pixel_points: 20
+    frame_dur: 0.1
+    self_x_f: 0.0
+    self_x_b: 0.0
+    self_y_l: 0.0
+    self_y_r: 0.0
+    blind_dis: 0.2
+    fov_up: 40.0
+    fov_down: -40.0
+    fov_left: 60.0
+    fov_right: -60.0
+    fov_cut: -20.0
+    
+    depth_thr1: 0.15 # not effective
+    enter_min_thr1: 1.2        # case1 entry: how much farther than min_depth a point must be to count as entering a gap
+    enter_max_thr1: 0.5 ##10.3  case1 entry: how much closer than max_depth (or min_depth) a point must be
+    map_cons_depth_thr1: 0.45
+    map_cons_hor_thr1: 0.01
+    map_cons_ver_thr1: 0.02
+    map_cons_hor_dis1: 0.12
+    map_cons_ver_dis1: 0.12
+    depth_cons_depth_thr1: 0.5 # unused
+    depth_cons_depth_max_thr1: 1.0 # unused
+    depth_cons_hor_thr1: 0.01 # unused
+    depth_cons_ver_thr1: 0.01 # unused
+    enlarge_z_thr1 : 2.5 # negative values have no effect
+    enlarge_angle: 2.5 
+    enlarge_depth: 3.5
+    occluded_map_thr1: 4
+    case1_interp_en: true
+
+    checkneighbor_range: 2
+
+    v_min_thr2: 0.7
+    acc_thr2: 5.0 # velocity consistency check
+    map_cons_depth_thr2: 0.2 # depth difference threshold
+    map_cons_hor_thr2: 0.02 # azimuth neighborhood
+    map_cons_ver_thr2: 0.02 # elevation neighborhood
+    occ_depth_thr2: 0.15 # foreground/background depth gap threshold; case2 entry: gap must exceed occ_depth_thr2 to count as entering a gap
+    occ_hor_thr2: 0.02 # occlusion angular neighborhood
+    occ_ver_thr2: 0.03
+    depth_cons_depth_thr2: 0.12
+    depth_cons_depth_max_thr2: 0.5
+    depth_cons_hor_thr2: 0.01
+    depth_cons_ver_thr2: 0.01
+    occluded_times_thr2: 5 # consecutive occluded frames required
+    k_depth2: 0.005
+    case2_interp_en: false
+
+    v_min_thr3: 0.7
+    acc_thr3: 10.0
+    map_cons_depth_thr3: 0.24
+    map_cons_hor_thr3: 0.015
+    map_cons_ver_thr3: 0.015
+    occ_depth_thr3: 0.15
+    occ_hor_thr3: 0.005
+    occ_ver_thr3: 0.005
+    depth_cons_depth_thr3: 0.3
+    depth_cons_depth_max_thr3: 1.0
+    depth_cons_hor_thr3: 0.01
+    depth_cons_ver_thr3: 0.01
+    occluding_times_thr3: 3
+    case3_interp_en: false
+
+    interp_hor_thr: 0.015
+    interp_ver_thr: 0.015
+    interp_thr1: 0.5
+    interp_static_max: 10.0
+    interp_start_depth1: 10
+    interp_kp1: 0.1
+    interp_kd1: 0.5
+    interp_bg: 0.8
+    interp_thr2: 0.25
+    interp_thr3: 0.05
+
+    point_index: -1 
+    debug_x: 7.2065
+    debug_y: -3.1844
+    debug_z: -0.89005
+    cluster_coupled: true
+    cluster_future: false
+    cluster_extend_pixel: 3
+    cluster_min_pixel_number: 1
+    cluster_thrustable_thresold: 0.6
+    cluster_Voxel_revolusion: 0.3
+
+    dyn_filter_en: false
+    debug_publish: false
+    publish_steady_en: true
+    
+
+    ver_resolution_max: 0.02 # depth image resolution
+    hor_resolution_max: 0.02

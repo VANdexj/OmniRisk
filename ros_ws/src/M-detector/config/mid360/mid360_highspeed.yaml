@@ -1,0 +1,241 @@
+dyn_obj:
+    points_topic: "/cloud_registered_no_point_filter"
+    points_in_world_frame: true
+    odom_topic: "/Odometry"
+    frame_id: "world"
+    pc_topic: "/cloud_registered_no_point_filter"
+    # Keep ROS transport queues small while allowing a bounded processing backlog.
+    input_queue_size: 20
+    sync_queue_size: 20
+    pending_queue_size: 10
+    sync_max_interval: 0.01
+    debug_publish: false
+
+    odom_visual_frame_id: "world"
+    odom_visual_child_frame_id: ""
+    # FAST-LIO owns the body TF; dynfilter only republishes visualization odometry.
+    odom_visual_publish_tf: false
+    odom_visual_lidar_offset_x: 0.0
+    odom_visual_lidar_offset_y: 0.0
+    odom_visual_lidar_offset_z: 0.0
+
+    dataset: 3
+    
+    # Point cloud buffer and depth image management
+    buffer_delay: 0.05
+    buffer_size: 100000
+    points_num_perframe: 30000
+    depth_map_dur: 0.1
+    max_depth_map_num: 10
+    max_pixel_points: 20
+    frame_dur: 0.05
+
+    # Spherical projection and FOV parameters
+    self_x_f: 0
+    self_x_b: 0
+    self_y_l: 0
+    self_y_r: 0
+    blind_dis: 0.05
+    fov_up: 52
+    fov_down: -7
+    fov_left: 180.0
+    fov_right: -180.0
+    fov_cut: -20.0
+    ver_resolution_max: 0.06
+    hor_resolution_max: 0.06
+    
+    # case1 detection
+    depth_thr1: 0.5                 # not effective
+    enter_min_thr1: 0.2             # case1 entry: how much farther than min_depth a point must be to count as entering a gap
+    enter_max_thr1: 0.2             # case1 entry: how much closer than max_depth (or min_depth) a point must be
+    map_cons_depth_thr1: 0.3        # depth tolerance for map consistency check; set smaller when close to obstacles
+    map_cons_hor_thr1: 0.04
+    map_cons_ver_thr1: 0.04
+    map_cons_hor_dis1: 0.3
+    map_cons_ver_dis1: 0.6
+    depth_cons_depth_thr1: 0.5      # unused
+    depth_cons_depth_max_thr1: 1.0  # unused
+    depth_cons_hor_thr1: 0.05       # unused
+    depth_cons_ver_thr1: 0.05       # unused
+    enlarge_z_thr1 : 3.0            # negative values have no effect
+    enlarge_angle: 2.0
+    enlarge_depth: 3.0
+    occluded_map_thr1: 4            # number of historical depth images that must pass
+    case1_interp_en: true
+
+    # Near-range fast confirm: Case1/Case3 use lower temporal evidence thresholds within 1m
+    near_range_fast_confirm_en: true
+    near_range_fast_confirm_distance: 2.0
+    near_range_case1_occluded_map_thr: 2
+    near_range_case3_occluded_times_thr: 2
+
+    # case2 detection
+    v_min_thr2: 0.25                 # minimum detectable speed; smaller detects slower dynamic targets
+    acc_thr2: 8.0                    # maximum allowed acceleration; larger is looser and more sensitive to non-uniform motion
+    map_cons_depth_thr2: 0.3         # Case 2 map consistency depth tolerance
+    map_cons_hor_thr2: 0.02
+    map_cons_ver_thr2: 0.06
+    occ_depth_thr2: 0.2             # foreground/background depth gap threshold, case2 entry
+    occ_hor_thr2: 0.02
+    occ_ver_thr2: 0.06
+    depth_cons_depth_thr2: 0.1
+    depth_cons_depth_max_thr2: 0.5
+    depth_cons_hor_thr2: 0.03
+    depth_cons_ver_thr2: 0.06
+    occluded_times_thr2: 4          # consecutive occlusions required for Case 2
+    k_depth2: 0.005
+    case2_interp_en: false
+
+    # case3 detection
+    v_min_thr3: 0.25
+    acc_thr3: 10.0
+    map_cons_depth_thr3: 0.3
+    map_cons_hor_thr3: 0.03
+    map_cons_ver_thr3: 0.03
+    occ_depth_thr3: 0.1
+    occ_hor_thr3: 0.03
+    occ_ver_thr3: 0.03
+    depth_cons_depth_thr3: 0.3
+    depth_cons_depth_max_thr3: 1.0
+    depth_cons_hor_thr3: 0.03
+    depth_cons_ver_thr3: 0.03
+    occluded_times_thr3: 4
+    case3_interp_en: false
+
+    # Depth interpolation
+    interp_hor_thr: 0.03
+    interp_ver_thr: 0.03
+    interp_thr1: 0.5
+    interp_static_max: 10.0
+    interp_start_depth1: 10
+    interp_kp1: 0.1
+    interp_kd1: 0.5
+    interp_bg: 0.8
+    interp_thr2: 0.25
+    interp_thr3: 0.05
+
+    point_index: -1
+    debug_x: 7.2065
+    debug_y: -3.1844
+    debug_z: -0.89005
+
+    # Clustering
+    cluster_coupled: true
+    cluster_future: false
+    cluster_extend_pixel: 4
+    cluster_min_pixel_number: 2
+    cluster_thrustable_thresold: 0.85
+    near_range_cluster_trustable_threshold: 0.5
+    cluster_Voxel_revolusion: 0.10    
+    cluster_map_origin_x: -10.0      # voxel clustering map x origin, m
+    cluster_map_origin_y: -10.0      # voxel clustering map y origin, m
+    cluster_map_origin_z: -0.5       # voxel clustering map z origin, m
+    cluster_map_range_x: 20.0        # voxel clustering map x extent
+    cluster_map_range_y: 20.0        # voxel clustering map y extent
+    cluster_map_range_z: 3.5         # voxel clustering map z extent
+
+    dyn_filter_en: true
+    publish_frame_out: true
+    publish_point_out: true
+    publish_std_points: true
+
+    # In-process target tracking
+    tracker:
+        enabled: true                                      # enable the in-process target tracker
+        tracks_topic: "/m_detector/confirmed_tracks"       # topic for confirmed tracks
+        tentative_tracks_topic: "/m_detector/tentative_tracks"  # topic for tentative tracks
+        predicted_tracks_topic: "/m_detector/predicted_tracks"  # topic for tracks extrapolated with current velocity
+        markers_topic: "/m_detector/confirmed_track_markers"    # topic for RViz markers of confirmed tracks
+        max_prediction_horizon: 0.10                      # max extrapolation toward current time when publishing tracks, s
+        lost_track_prediction_time: 0.30                  # how long to keep predicting and publishing after real dynamic observations stop, s
+
+        # Single-frame Euclidean clustering: group dynamic points into detection boxes
+        cluster_tolerance: 0.5                            # max distance between neighboring points in one cluster, m
+        cluster_min_points_process: 1                     # min points to associate with and update existing tracks
+        cluster_min_points: 2                             # min points to create a new tentative track
+        cluster_max_points: 10000                         # max points in a valid cluster
+
+        # Track initialization, lifetime and history
+        min_init_hits: 1                                  # min hit frames within the init window to confirm a regular track
+        init_window_size: 10                               # sliding window length for confirming new tracks, frames
+        near_range_fast_confirm_en: true                  # allow near-range targets to confirm with fewer hits
+        near_range_fast_confirm_distance: 3.0             # targets whose centroid is within this distance of the drone count as near-range, m
+        near_range_fast_confirm_hits: 1                   # min hit frames to confirm a near-range track
+        track_lifetime_frames: 12                         # delete a track after this many consecutive missed frames
+        track_history_size: 10                             # max position history points per track, for trail display
+
+        # Detection-to-track association
+        point_out_dynamic_support_en: true                # add point_out clusters as extra dynamic detections
+        point_out_duplicate_distance: 0.25                # deduplicate point_out detections closer than this to an existing dynamic detection centroid, m
+        min_iou: -1                                       # min 3D AABB IoU for association; -1 disables the IoU gate
+        max_center_distance: 1.0                          # base max distance between detection centroid and predicted track position, m
+        association_padding: 0.5                          # association box padding per side, also used as reachability margin, m
+        association_mahalanobis_gate_sq: 11.34            # upper bound on squared 3D innovation Mahalanobis distance for association
+        duplicate_guard_en: true                          # merge dynamic detections that are too close and duplicate confirmed tracks
+        duplicate_guard_distance: 0.25                    # centroid distance at which detections or confirmed tracks count as duplicates, m
+        duplicate_guard_bbox_gap: 0.05                    # max gap for merging two boxes inside the same track envelope, m
+        default_dt: 0.1                                   # default filter period when timestamps are invalid or too close, s
+
+        # Kalman filter and motion constraints
+        ballistic_model_en: true                           # ballistic model with known gravity input; when off, use the constant-velocity model
+        gravity_world_x: 0.0                               # gravity X component in world frame, m/s^2
+        gravity_world_y: 0.0                               # gravity Y component in world frame, m/s^2
+        gravity_world_z: -9.81                             # gravity Z component in world frame (world Z points up), m/s^2
+        process_acceleration_stddev: 3.0                   # stddev of unmodeled acceleration (drag, detection noise), m/s^2
+        dynamic_position_variance: 0.1                    # dynamic detection position noise variance, m^2; smaller trusts detections more
+        max_target_speed: 12.0                            # design max target speed for reachability checks and velocity clamping, m/s
+        max_target_acceleration: 6.0                      # unmodeled acceleration margin in ballistic mode; max target acceleration in CV mode, m/s^2
+
+        # Detection box size prior
+        bbox_size_prior_en: true                          # reject detections whose box side lengths are out of range
+        bbox_size_prior_min: 0.05                         # min allowed box side length, m
+        bbox_size_prior_max: 0.50                         # max allowed box side length, m
+
+        # Target filtering based on drone odometry and world coordinates
+        target_distance_filter_en: true                   # filter detections and tracks by horizontal/vertical distance to the drone
+        target_max_xy_distance: 6.0                       # max horizontal distance from the drone, m
+        target_max_z_distance: 1.5                        # max absolute vertical distance from the drone, m
+        target_origin_bbox_filter_en: false               # keep only detections and tracks inside a fixed box around the world origin
+        target_origin_bbox_min_x: -5.0                    # fixed box X lower bound, m
+        target_origin_bbox_max_x: 5.0                     # fixed box X upper bound, m
+        target_origin_bbox_min_y: -5.0                    # fixed box Y lower bound, m
+        target_origin_bbox_max_y: 5.0                     # fixed box Y upper bound, m
+        target_origin_bbox_min_z: -0.1                    # fixed box Z lower bound, m
+        target_origin_bbox_max_z: 2.0                     # fixed box Z upper bound, m
+        target_ground_filter_en: true                     # drop targets whose centroid is below the min world height
+        target_min_world_z: 0.05                          # min world Z of the target centroid, m
+        target_volume_filter_en: true                     # filter targets by bounding box volume
+        target_min_bbox_volume: 0.001                     # min bounding box volume, m^3; 0 keeps small targets
+        target_max_bbox_volume: 0.12                      # max bounding box volume, m^3
+        target_speed_filter_en: true                      # suppress persistently slow dynamic tracks from the output
+        target_min_speed: 0.5                             # min speed for a track to pass the output speed filter, m/s
+        target_speed_filter_grace_time: 2.0               # grace time for output after a track drops below the speed threshold, s
+
+        # Use the current unfiltered registered cloud to support tracks whose dynamic points are temporarily missing
+        static_support_en: false                          # keep tracking with static visible points from the unfiltered cloud
+        static_support_hold_time: 0.3                     # max time static points can support a track after dynamic detections stop, s
+        static_support_bbox_expand_ratio: 0.6             # extra expansion ratio on the predicted box when searching support points
+        static_support_bbox_padding: 0.05                 # extra padding per side of the support search box, m
+        static_support_min_points: 3                      # min points for a static support cluster
+        static_support_cluster_tolerance: 0.35            # neighbor distance threshold for static support Euclidean clustering, m
+        static_support_cluster_max_points: 300            # max points in one static support cluster
+        static_support_max_residual: 0.3                  # max residual between support cluster centroid and predicted track position, m
+        static_support_position_variance: 0.5             # static support position noise variance, m^2; larger means weaker trust
+        static_support_min_activation_speed: 0.3          # static support only after the track has reached this speed, m/s; 0 means no limit
+
+        # Debug logging
+        debug_track_lifecycle: false                      # log track creation, confirmation, merge and deletion
+        debug_association_rejects: false                  # log why detection-to-track associations are rejected
+        debug_print_detections: false                     # log per-frame detection details
+        debug_print_association_matrix: false             # log the track-detection association candidate matrix
+        debug_bbox_prior_rejects: false                   # log size-prior or volume filter rejections
+        debug_distance_rejects: false                     # log distance, fixed-region or ground filter rejections
+        debug_static_support: false                       # log static support matches and skips
+
+        # RViz visualization
+        marker_bbox_scale: 1.1                            # display scale of the bounding box relative to the estimated size
+        marker_bbox_min_size: 0.1                         # min displayed box side length, m
+        marker_velocity_arrow_scale: 1.0                  # velocity arrow length per unit speed, s
+        marker_velocity_min_speed: 0.05                   # hide the velocity arrow below this speed, m/s
+        marker_velocity_max_arrow_length: 2.0             # max displayed velocity arrow length, m
+        marker_velocity_text_size: 0.35                   # text height of the velocity marker, m

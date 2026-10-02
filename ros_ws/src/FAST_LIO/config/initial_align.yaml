@@ -1,0 +1,21 @@
+wxx:
+  initial_align:
+    voxelgrid_filter_size:  0.2
+    max_iteration:          5
+    icp_mode:               4   # 4 is best
+    initial_map_size:       30
+
+    Init_Body_pos_x: 0.0
+    Init_Body_pos_y: 0.0
+    Init_Body_pos_z: 0.0
+
+zty:
+  advanced_by_scan_context: false
+  init_zone_width:          10.0
+  init_zone_height:         10.0
+  init_resolution:          1.0
+  scancontext:
+    test_PC_NUM_RING:       40
+    test_PC_NUM_SECTOR:     120
+    test_PC_MAX_RADIUS:     20
+    print_detail_score:     false
